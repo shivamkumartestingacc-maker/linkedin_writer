@@ -1,6 +1,6 @@
 // Run: node test.js
 const assert = require('assert');
-const { plain, toggle, toggleList, continueList } = require('./format.js');
+const { plain, toggle, toggleList, continueList, cleanPaste } = require('./format.js');
 
 const b = toggle('Hello 2026', 'bold');
 assert.strictEqual(b, '𝗛𝗲𝗹𝗹𝗼 𝟮𝟬𝟮𝟲');
@@ -27,6 +27,10 @@ assert.strictEqual(continueList('👉🏽 x').next, '👉🏽 ');
 assert.strictEqual(continueList('📌 ').empty, true);
 assert.strictEqual(continueList('Plain line'), null);
 assert.strictEqual(continueList('🚀Launch'), null);                                  // emoji needs a space after it
+assert.strictEqual(cleanPaste('a\u00A0b\r\nc\u200B\t \n\n\n\nd'), 'a b\nc\n\nd');
+assert.strictEqual(cleanPaste('👩\u200D💻 ok'), '👩\u200D💻 ok');                    // emoji joiner kept
+assert.strictEqual(cleanPaste('𝗛𝗶 there'), '𝗛𝗶 there');                               // normal paste keeps styling
+assert.strictEqual(cleanPaste('𝗛𝗶 there', true), 'Hi there');                         // pure paste removes it
 const { check } = require('./rules.js');
 assert.strictEqual(check('Hook\n\na. x\nb. y\nc. z').rules.find(r => r.id === 'list').status, 'ok');
 const st = (t, id) => check(t).rules.find(r => r.id === id).status;

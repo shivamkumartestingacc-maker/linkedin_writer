@@ -104,6 +104,22 @@
     if (k) { e.preventDefault(); replaceSelection(t => Fmt.toggle(t, k)); }
   });
 
+  // Paste always lands as clean plain text. Cmd/Ctrl+Shift+V (with or without Option)
+  // also removes bold/italic styling. Browsers don't say which keys made a paste, so remember them.
+  let purePaste = false;
+  ta.addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'v') purePaste = true;
+  });
+  ta.addEventListener('paste', e => {
+    const raw = e.clipboardData && e.clipboardData.getData('text/plain');
+    const pure = purePaste;
+    purePaste = false;
+    if (!raw) return;
+    e.preventDefault();
+    insert(Fmt.cleanPaste(raw, pure));
+    if (pure) toast('Pasted as plain text');
+  });
+
   ta.addEventListener('input', update);
   for (const ev of ['keyup', 'click', 'select']) ta.addEventListener(ev, showNow);
 

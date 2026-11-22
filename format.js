@@ -128,7 +128,21 @@
     }).join('\n');
   }
 
-  const api = { plain, toggle, toggleList, continueList, marker, flags };
+  // Clean pasted text: plain line breaks, normal spaces, no invisible junk, at most one blank line.
+  // Zero-width joiner (U+200D) is kept because emoji like 👩‍💻 need it.
+  // pure = true also turns styled letters (𝗯𝗼𝗹𝗱) back into normal letters.
+  function cleanPaste(text, pure = false) {
+    let t = text
+      .replace(/\r\n?/g, '\n')
+      .replace(/[\u00A0\u2007\u202F\t]/g, ' ')
+      .replace(/[\u200B\u200C\u2060\uFEFF\u00AD]/g, '')
+      .replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, '')
+      .replace(/[ ]+$/gm, '')
+      .replace(/\n{3,}/g, '\n\n');
+    return pure ? plain(t) : t;
+  }
+
+  const api = { plain, toggle, toggleList, continueList, marker, flags, cleanPaste };
   if (typeof module !== 'undefined') module.exports = api;
   else root.Fmt = api;
 })(this);
