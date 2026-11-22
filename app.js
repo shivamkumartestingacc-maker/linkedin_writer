@@ -263,11 +263,23 @@
   $('#more-emoji').addEventListener('click', () => showPicker($('#picker').hidden));
 
   // Built once; clicking inserts, or adds to favourites while editing.
+  // A sticky row of tabs (one per category) scrolls to that category.
   const picker = $('#picker');
+  const tabs = document.createElement('div');
+  tabs.className = 'picker-tabs';
+  tabs.setAttribute('role', 'tablist');
+  picker.appendChild(tabs);
+  const heads = [];
   for (const [group, list] of Object.entries(window.EMOJIS)) {
     const h = document.createElement('div');
     h.className = 'group'; h.textContent = group;
     picker.appendChild(h);
+    heads.push(h);
+    const tab = document.createElement('button');
+    tab.type = 'button'; tab.title = group; tab.setAttribute('aria-label', group);
+    tab.textContent = list.split(' ').find(Boolean);
+    tab.addEventListener('click', () => picker.scrollTo({ top: h.offsetTop - tabs.offsetHeight, behavior: 'smooth' }));
+    tabs.appendChild(tab);
     const row = document.createElement('div');
     row.className = 'grid';
     list.split(' ').filter(Boolean).forEach(em => {
@@ -278,6 +290,14 @@
     });
     picker.appendChild(row);
   }
+  // Highlight the tab of the category at the top of the list.
+  const markTab = () => {
+    let i = 0;
+    heads.forEach((h, k) => { if (h.offsetTop - tabs.offsetHeight <= picker.scrollTop + 4) i = k; });
+    [...tabs.children].forEach((t, k) => t.classList.toggle('on', k === i));
+  };
+  picker.addEventListener('scroll', markTab);
+  markTab();
 
   // ---------- Preview ----------
   const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
