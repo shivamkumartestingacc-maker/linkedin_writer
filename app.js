@@ -47,6 +47,9 @@
   }));
 
   $('#clear').addEventListener('click', () => replaceSelection(Fmt.plain));
+  // Native undo history (execCommand keeps it for our formatting too).
+  $('#undo').addEventListener('click', () => { ta.focus(); document.execCommand('undo'); update(); });
+  $('#redo').addEventListener('click', () => { ta.focus(); document.execCommand('redo'); update(); });
 
   ta.addEventListener('keydown', e => {
     if (!(e.ctrlKey || e.metaKey)) return;
@@ -178,7 +181,8 @@
 
   $('#edit-favs').addEventListener('click', () => {
     editing = !editing;
-    $('#edit-favs').textContent = editing ? 'Done' : 'Edit';
+    $('#edit-favs').title = editing ? 'Done editing favourites' : 'Edit favourite emojis';
+    $('#edit-favs').setAttribute('aria-pressed', editing);
     $('#edit-favs').classList.toggle('on', editing);
     $('#fav-editor').hidden = !editing;
     showPicker(editing || !$('#picker').hidden);
@@ -190,7 +194,8 @@
   $('#reset-favs').addEventListener('click', () => { favs = [...DEFAULT_FAVS]; saveFavs(); });
   function showPicker(on) {
     $('#picker').hidden = !on;
-    $('#more-emoji').textContent = on ? 'All emojis ▴' : 'All emojis ▾';
+    $('#more-emoji').classList.toggle('on', on);
+    $('#more-emoji').setAttribute('aria-pressed', on);
   }
   $('#more-emoji').addEventListener('click', () => showPicker($('#picker').hidden));
 
@@ -377,7 +382,7 @@
   // ---------- Copy ----------
   // The text already holds the Unicode styled characters, so a plain-text copy
   // pastes into LinkedIn looking exactly like the editor.
-  $('#copy').addEventListener('click', async () => {
+  const copy = async () => {
     const t = ta.value;
     if (!t) { toast('Nothing to copy'); return; }
     try { await navigator.clipboard.writeText(t); }
@@ -385,7 +390,8 @@
       ta.focus(); ta.select(); document.execCommand('copy');
     }
     toast('Copied. Paste into LinkedIn.');
-  });
+  };
+  document.querySelectorAll('.js-copy').forEach(b => b.addEventListener('click', copy));
 
   let toastTimer;
   function toast(msg) {

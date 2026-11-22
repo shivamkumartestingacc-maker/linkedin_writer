@@ -14,30 +14,28 @@
         <h1 class="title">LinkedIn Writer</h1>
         <span class="caption">Draft saves automatically</span>
       </div>
-      <div class="toolbar" role="toolbar" aria-label="Formatting">
-        <button data-fmt="bold" title="Bold (Ctrl+B)"><b>B</b></button>
-        <button data-fmt="italic" title="Italic (Ctrl+I)"><i>I</i></button>
-        <button data-fmt="underline" title="Underline (Ctrl+U)"><u>U</u></button>
-        <button data-fmt="strike" title="Strikethrough"><s>S</s></button>
-        <button data-fmt="mono" title="Monospace"><code>M</code></button>
-        <span class="sep"></span>
-        <button data-list="bullet" title="Bullet list">• List</button>
-        <button data-list="number" title="Numbered list">1. List</button>
-        <span class="sep"></span>
-        <button id="clear" title="Remove formatting from selection">Clear</button>
-      </div>
-
-      <section class="emoji-box" aria-label="Emojis">
-        <div class="box-head">
-          <span class="box-label">Favourite emojis</span>
-          <div class="box-actions">
-            <button id="edit-favs" class="text-btn" type="button" title="Edit favourites">Edit</button>
-            <button id="more-emoji" class="text-btn" type="button" title="All emojis">All emojis ▾</button>
-          </div>
+      <div class="composer">
+        <div class="toolbar" role="toolbar" aria-label="Formatting">
+          <button data-fmt="bold" title="Bold (Ctrl+B)" class="glyph"><b>B</b></button>
+          <button data-fmt="italic" title="Italic (Ctrl+I)" class="glyph"><i>I</i></button>
+          <button data-fmt="strike" title="Strikethrough" class="glyph"><s>S</s></button>
+          <button data-fmt="underline" title="Underline (Ctrl+U)" class="glyph"><u>U</u></button>
+          <span class="sep"></span>
+          <button data-list="bullet" title="Bullet list"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r=".9" fill="currentColor"/><circle cx="4.5" cy="12" r=".9" fill="currentColor"/><circle cx="4.5" cy="18" r=".9" fill="currentColor"/></svg></button>
+          <button data-list="number" title="Numbered list"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6h10M10 12h10M10 18h10M4 4.5h1.5V9M3.5 9h3M3.5 14.5a1.5 1.5 0 0 1 3 .3c0 1.2-3 2.2-3 3.7h3"/></svg></button>
+          <span class="sep"></span>
+          <button data-fmt="mono" title="Monospace"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M13.5 6l-3 12"/></svg></button>
+          <button id="clear" title="Remove formatting from selection"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 6h10M10 6v12M14 14l6 6M20 14l-6 6"/></svg></button>
+          <span class="sep"></span>
+          <button id="undo" title="Undo (Ctrl+Z)"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
+          <button id="redo" title="Redo (Ctrl+Shift+Z)"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg></button>
         </div>
+
+        <textarea id="text" placeholder="Write your post…" spellcheck="true"></textarea>
+
         <div id="favs" class="favs" aria-label="Favourite emojis"></div>
 
-        <div id="fav-editor" class="box-section" hidden>
+        <div id="fav-editor" class="composer-section" hidden>
           <p class="hint">Drag to reorder. Click × to remove. Pick from all emojis below to add, or type your own:</p>
           <form id="add-fav" class="row">
             <input id="fav-input" placeholder="e.g. → or ✔️ or 👉🏻" maxlength="20">
@@ -46,13 +44,18 @@
           </form>
         </div>
 
-        <div id="picker" class="box-section picker" hidden></div>
-      </section>
+        <div id="picker" class="composer-section picker" hidden></div>
 
-      <textarea id="text" placeholder="Write your post…" spellcheck="true"></textarea>
+        <div class="composer-bar">
+          <button id="more-emoji" class="bar-btn round" type="button" title="All emojis" aria-pressed="false"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5s1.3 2 3.5 2 3.5-2 3.5-2"/><circle cx="9" cy="10" r=".8" fill="currentColor"/><circle cx="15" cy="10" r=".8" fill="currentColor"/></svg></button>
+          <button id="edit-favs" class="bar-btn" type="button" title="Edit favourite emojis" aria-pressed="false"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg></button>
+          <span class="bar-sep"></span>
+          <span class="bar-count"><span id="count">0</span> / 3000</span>
+          <button class="bar-copy js-copy" type="button" title="Copy for LinkedIn"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3 3 10.5l7 2.5 2.5 7L21 3zM10 13l5-5"/></svg><span>Copy</span></button>
+        </div>
+      </div>
       <div class="meta-row">
         <div id="now" class="now" aria-live="polite"></div>
-        <div class="meta"><span id="count">0</span> / 3000 characters</div>
       </div>
 
       <details id="rules" class="panel rules" open>
@@ -80,7 +83,7 @@
         </div>
         <div class="head-actions">
           <button id="theme" type="button" title="Switch light or dark">☀ Light</button>
-          <button id="copy" class="primary">Copy for LinkedIn</button>
+          <button id="copy" class="primary js-copy">Copy for LinkedIn</button>
         </div>
       </div>
       <div class="preview-controls">
