@@ -1,6 +1,6 @@
 // Run: node test.js
 const assert = require('assert');
-const { plain, toggle, toggleList } = require('./format.js');
+const { plain, toggle, toggleList, continueList } = require('./format.js');
 
 const b = toggle('Hello 2026', 'bold');
 assert.strictEqual(b, '𝗛𝗲𝗹𝗹𝗼 𝟮𝟬𝟮𝟲');
@@ -14,7 +14,21 @@ assert.strictEqual(toggle('Hi 👋', 'bold'), '𝗛𝗶 👋');          // emoj
 assert.strictEqual(toggleList('a\nb', 'bullet'), '• a\n• b');
 assert.strictEqual(toggleList('• a\n• b', 'bullet'), 'a\nb');
 assert.strictEqual(toggleList('a\n\nb', 'number'), '1. a\n\n2. b');
+assert.strictEqual(toggleList('x\ny\nz', 'alpha'), 'a. x\nb. y\nc. z');
+assert.strictEqual(toggleList('a. x\nb. y', 'alpha'), 'x\ny');
+assert.strictEqual(toggleList('x\ny', 'emoji', '📌'), '📌 x\n📌 y');
+assert.strictEqual(toggleList('📌 x\n📌 y', 'emoji', '👉'), '👉 x\n👉 y');           // switch marker
+assert.strictEqual(toggleList('👉 x\n👉 y', 'emoji', '👉'), 'x\ny');                // toggle off
+assert.strictEqual(toggleList('1. x\n2. y', 'alpha'), 'a. x\nb. y');
+assert.deepStrictEqual(continueList('b. item'), { next: 'c. ', empty: false, len: 3 });
+assert.strictEqual(continueList('9. x').next, '10. ');
+assert.strictEqual(continueList('→ x').next, '→ ');
+assert.strictEqual(continueList('👉🏽 x').next, '👉🏽 ');
+assert.strictEqual(continueList('📌 ').empty, true);
+assert.strictEqual(continueList('Plain line'), null);
+assert.strictEqual(continueList('🚀Launch'), null);                                  // emoji needs a space after it
 const { check } = require('./rules.js');
+assert.strictEqual(check('Hook\n\na. x\nb. y\nc. z').rules.find(r => r.id === 'list').status, 'ok');
 const st = (t, id) => check(t).rules.find(r => r.id === id).status;
 const post = 'Short hook here.\n\nLine one.\nLine two.\nLine three.\nLine four is too many.\n\nWhat do you think?';
 const r = check(post);

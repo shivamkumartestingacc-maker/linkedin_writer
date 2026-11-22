@@ -86,21 +86,49 @@
     return render(text, f);
   }
 
-  // Toggle a line prefix ("• " or numbered) on every line of a selection.
-  function toggleList(text, kind) {
+  // ---------- Lists ----------
+  // A list line starts with "• ", "1. ", "a. " or an emoji/arrow followed by a space.
+  const NUM = /^(\d+)\. /, ALPHA = /^([a-z])\. /;
+  const MARK = /^(?:\p{Extended_Pictographic}|\p{Regional_Indicator}{2}|[#*0-9]\uFE0F?\u20E3|[→←↑↓↳▸►▶•◦▪✔✓✗➡➤])[\uFE0F\u200D\p{Extended_Pictographic}\p{Emoji_Modifier}]* /u;
+  const letter = n => String.fromCharCode(97 + (n - 1) % 26);
+
+  function listPrefix(line) {
+    let m;
+    if ((m = NUM.exec(line))) return { kind: 'number', n: +m[1], len: m[0].length };
+    if ((m = ALPHA.exec(line))) return { kind: 'alpha', n: m[1].charCodeAt(0) - 96, len: m[0].length };
+    if ((m = MARK.exec(line))) {
+      const mark = m[0].trimEnd();
+      return { kind: mark === '•' ? 'bullet' : 'emoji', mark, n: 1, len: m[0].length };
+    }
+    return null;
+  }
+
+  function marker(kind, n, emoji) {
+    return kind === 'bullet' ? '• ' : kind === 'number' ? `${n}. ` : kind === 'alpha' ? `${letter(n)}. ` : `${emoji} `;
+  }
+
+  // For Enter on a list line: the next line's marker, and whether this item is empty (ends the list).
+  function continueList(line) {
+    const p = listPrefix(line);
+    if (!p) return null;
+    return { next: marker(p.kind, p.n + 1, p.mark), empty: !line.slice(p.len).trim(), len: p.len };
+  }
+
+  // Toggle a list (bullet | number | alpha | emoji) on every line of a selection.
+  function toggleList(text, kind, emoji = '•') {
     const lines = text.split('\n');
-    const re = kind === 'bullet' ? /^• / : /^\d+\. /;
-    const all = lines.filter(l => l.trim()).every(l => re.test(l));
+    const is = l => { const p = listPrefix(l); return p && p.kind === kind && (kind !== 'emoji' || p.mark === emoji); };
+    const all = lines.filter(l => l.trim()).every(is);
     let n = 0;
     return lines.map(l => {
       if (!l.trim()) return l;
-      if (all) return l.replace(re, '');
-      const bare = l.replace(/^• |^\d+\. /, '');
-      return kind === 'bullet' ? '• ' + bare : `${++n}. ` + bare;
+      const p = listPrefix(l);
+      const bare = p ? l.slice(p.len) : l;
+      return all ? bare : marker(kind, ++n, emoji) + bare;
     }).join('\n');
   }
 
-  const api = { plain, toggle, toggleList, flags };
+  const api = { plain, toggle, toggleList, continueList, marker, flags };
   if (typeof module !== 'undefined') module.exports = api;
   else root.Fmt = api;
 })(this);

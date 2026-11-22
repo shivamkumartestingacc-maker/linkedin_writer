@@ -7,7 +7,7 @@
   const BUZZ = ['best', 'synergy', 'synergies', 'next-gen', 'next gen', 'leverage', 'game-changer',
     'game changer', 'cutting-edge', 'world-class', 'innovative', 'disruptive', 'paradigm', 'holistic',
     'seamless', 'robust', 'revolutionize', 'revolutionary', 'thought leader', 'rockstar', 'ninja', 'very'];
-  const LIST = /^(\p{Extended_Pictographic}|[•◦▪▸►→\-–*]|\d+[.)]\s)/u;
+  const LIST = /^(\p{Extended_Pictographic}|[•◦▪▸►→\-–*]|\d+[.)]\s|[a-z][.)]\s)/u;
   const SUB = /^↳/;
   const seg = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter() : null;
   const firstChar = s => seg ? seg.segment(s)[Symbol.iterator]().next().value.segment : [...s][0];
@@ -64,7 +64,7 @@
       if (!LIST.test(lines[i].trim())) { i++; continue; }
       const start = i, marks = [];
       for (; i < lines.length && (LIST.test(lines[i].trim()) || SUB.test(lines[i].trim())); i++) {
-        if (!SUB.test(lines[i].trim())) marks.push(firstChar(lines[i].trim()).replace(/^\d$/, '#'));
+        if (!SUB.test(lines[i].trim())) { const t = lines[i].trim(); marks.push(/^\d+[.)]\s/.test(t) ? '#' : /^[a-z][.)]\s/.test(t) ? 'a' : firstChar(t)); }
       }
       const n = marks.length, kinds = new Set(marks);
       const pairs = [...kinds].every(m => m === '❌' || m === '✅');

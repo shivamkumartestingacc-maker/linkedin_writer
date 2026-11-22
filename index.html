@@ -23,6 +23,15 @@
           <span class="sep"></span>
           <button data-list="bullet" title="Bullet list"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r=".9" fill="currentColor"/><circle cx="4.5" cy="12" r=".9" fill="currentColor"/><circle cx="4.5" cy="18" r=".9" fill="currentColor"/></svg></button>
           <button data-list="number" title="Numbered list"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6h10M10 12h10M10 18h10M4 4.5h1.5V9M3.5 9h3M3.5 14.5a1.5 1.5 0 0 1 3 .3c0 1.2-3 2.2-3 3.7h3"/></svg></button>
+          <button data-list="alpha" title="Lettered list (a. b. c.)"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6h10M10 12h10M10 18h10"/><g fill="currentColor" stroke="none" font-family="system-ui, sans-serif" font-size="6.5" font-weight="600"><text x="2.2" y="8.3">a</text><text x="2.2" y="14.3">b</text><text x="2.4" y="20.3">c</text></g></svg></button>
+          <span class="starter-wrap">
+            <button id="emoji-list" class="starter-btn" title="Emoji list: pick the emoji that starts each line" aria-haspopup="true" aria-expanded="false"><span id="emoji-list-mark">📌</span><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+            <div id="starter-pop" class="starter-pop" hidden>
+              <div class="pop-label">Start each line with</div>
+              <div id="starter-grid" class="grid"></div>
+              <p class="hint">Uses your favourites. Add more with ✎ below.</p>
+            </div>
+          </span>
           <span class="sep"></span>
           <button data-fmt="mono" title="Monospace"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M13.5 6l-3 12"/></svg></button>
           <button id="clear" title="Remove formatting from selection"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 6h10M10 6v12M14 14l6 6M20 14l-6 6"/></svg></button>

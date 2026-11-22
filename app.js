@@ -34,7 +34,7 @@
     b.addEventListener('click', () => replaceSelection(t => Fmt.toggle(t, b.dataset.fmt))));
 
   // Lists act on whole lines, so widen the selection to line edges first.
-  document.querySelectorAll('[data-list]').forEach(b => b.addEventListener('click', () => {
+  function applyList(kind, emoji) {
     const v = ta.value;
     const s = v.lastIndexOf('\n', ta.selectionStart - 1) + 1;
     let end = ta.selectionEnd;
@@ -42,9 +42,37 @@
     let e = v.indexOf('\n', end);
     if (e === -1) e = v.length;
     ta.setSelectionRange(s, e);
-    if (s === e) { insert(b.dataset.list === 'bullet' ? '• ' : '1. '); return; }
-    replaceSelection(t => Fmt.toggleList(t, b.dataset.list));
-  }));
+    if (s === e) { insert(Fmt.marker(kind, 1, emoji)); return; }
+    replaceSelection(t => Fmt.toggleList(t, kind, emoji));
+  }
+  document.querySelectorAll('[data-list]').forEach(b => b.addEventListener('click', () => applyList(b.dataset.list)));
+
+  // Emoji list: choose the starter from your favourites; it is remembered for next time.
+  let starter = store.get('starter', '📌');
+  const pop = $('#starter-pop');
+  $('#emoji-list-mark').textContent = starter;
+  function openStarter(open) {
+    pop.hidden = !open;
+    $('#emoji-list').setAttribute('aria-expanded', open);
+    if (!open) return;
+    const grid = $('#starter-grid');
+    grid.innerHTML = '';
+    favs.forEach(f => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.textContent = f;
+      b.classList.toggle('on', f === starter);
+      b.addEventListener('click', () => {
+        starter = f; store.set('starter', f);
+        $('#emoji-list-mark').textContent = f;
+        openStarter(false);
+        applyList('emoji', f);
+      });
+      grid.appendChild(b);
+    });
+  }
+  $('#emoji-list').addEventListener('click', e => { e.stopPropagation(); openStarter(pop.hidden); });
+  document.addEventListener('click', e => { if (!pop.hidden && !pop.contains(e.target)) openStarter(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !pop.hidden) openStarter(false); });
 
   $('#clear').addEventListener('click', () => replaceSelection(Fmt.plain));
   // Native undo history (execCommand keeps it for our formatting too).
@@ -52,6 +80,25 @@
   $('#redo').addEventListener('click', () => { ta.focus(); document.execCommand('redo'); update(); });
 
   ta.addEventListener('keydown', e => {
+    // Enter on a list line starts the next item with the same marker (next number or letter).
+    // Enter on an empty item ends the list. Shift+Enter always makes a plain new line.
+    if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.isComposing && ta.selectionStart === ta.selectionEnd) {
+      const v = ta.value, pos = ta.selectionStart;
+      const ls = v.lastIndexOf('\n', pos - 1) + 1;
+      let le = v.indexOf('\n', pos); if (le === -1) le = v.length;
+      const c = Fmt.continueList(v.slice(ls, le));
+      if (c && pos >= ls + c.len) {
+        e.preventDefault();
+        if (c.empty) {
+          ta.setSelectionRange(ls, ls + c.len);
+          if (!document.execCommand('delete')) ta.setRangeText('', ls, ls + c.len, 'end');
+          ta.setSelectionRange(ls, ls);
+          update();
+        }
+        else insert('\n' + c.next);
+        return;
+      }
+    }
     if (!(e.ctrlKey || e.metaKey)) return;
     const k = { b: 'bold', i: 'italic', u: 'underline' }[e.key.toLowerCase()];
     if (k) { e.preventDefault(); replaceSelection(t => Fmt.toggle(t, k)); }
