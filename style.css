@@ -332,10 +332,9 @@ textarea:focus, textarea.warn, textarea.warn:focus { border: none; outline: none
 
 .favs { padding: 10px 8px; border-top: 1px solid var(--line); grid-template-columns: repeat(auto-fill, minmax(34px, 1fr)); }
 /* Emojis rest in grey and show their colour when the mouse is over them.
-   With the keyboard, only the emoji you're on shows colour. */
+   Moving through them with the keyboard shows all colours too. */
 .favs button { filter: grayscale(1); opacity: .55; transition: filter .15s, opacity .15s; }
-.favs:hover button, .favs.editing button { filter: none; opacity: 1; }
-.favs.kbd-nav:not(:hover) button { filter: grayscale(1); opacity: .55; }
+.favs:hover button, .favs.editing button, .favs.kbd-nav button { filter: none; opacity: 1; }
 .favs.kbd-nav button.kbd { filter: none; opacity: 1; background: var(--raised); box-shadow: 0 0 0 2px var(--strong); }
 .favs button:focus-visible { outline: none; }
 .favs button { height: 34px; font-size: 19px; border-radius: 10px; }
