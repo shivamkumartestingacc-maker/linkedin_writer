@@ -14,4 +14,23 @@ assert.strictEqual(toggle('Hi 👋', 'bold'), '𝗛𝗶 👋');          // emoj
 assert.strictEqual(toggleList('a\nb', 'bullet'), '• a\n• b');
 assert.strictEqual(toggleList('• a\n• b', 'bullet'), 'a\nb');
 assert.strictEqual(toggleList('a\n\nb', 'number'), '1. a\n\n2. b');
+const { check } = require('./rules.js');
+const st = (t, id) => check(t).rules.find(r => r.id === id).status;
+const post = 'Short hook here.\n\nLine one.\nLine two.\nLine three.\nLine four is too many.\n\nWhat do you think?';
+const r = check(post);
+assert.strictEqual(st(post, 'hook'), 'ok');
+assert.strictEqual(st(post, 'gap'), 'ok');
+assert.strictEqual(st(post, 'para'), 'warn');
+assert.deepStrictEqual(r.rules.find(x => x.id === 'para').lines, [5]);   // only the 4th line
+assert.ok(r.lineIssues[5][0].startsWith('Line 4 in a row'));
+assert.strictEqual(st(post, 'question'), 'ok');
+assert.strictEqual(st('Hook\nno gap', 'gap'), 'warn');
+assert.strictEqual(st('Hook\n\n👉 a\n👉 b\n👉 c\n👉 d', 'list'), 'ok');
+assert.strictEqual(st('Hook\n\n👉 a\n📌 b\n👉 c', 'list'), 'warn');
+assert.strictEqual(st('Hook\n\n❌ a\n✅ b', 'list'), 'ok');
+assert.strictEqual(st('Hook\n\n👉 a\n👉 b\n👉 c\n👉 d\n👉 e\n👉 f\n👉 g\nx', 'para'), 'ok'); // list lines don't count
+assert.strictEqual(st('This is the very best idea', 'buzz'), 'warn');
+assert.strictEqual(st('Everybody loves this', 'buzz'), 'ok');               // "very" inside a word
+assert.strictEqual(st('Hook\n\nP.S. thanks?\nDone.', 'question'), 'warn');
+assert.strictEqual(st('one two three four five six seven eight nine ten eleven twelve thirteen', 'hook'), 'warn');
 console.log('ok');

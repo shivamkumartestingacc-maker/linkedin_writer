@@ -9,6 +9,7 @@ Open `index.html` in a browser. No install, no build.
 - **Left:** editor. Select text, then use the toolbar or Ctrl+B / Ctrl+I / Ctrl+U.
 - **Emojis:** click a favourite to insert it. **Edit** lets you remove favourites, add any emoji from **More**, or add your own symbol.
 - **Right:** LinkedIn preview. **Feed** shows the 3-line cut with "…more". **Expanded** shows the full post. Add an image to preview it.
+- **Jay's LinkedIn rules:** live checks under the editor. The line you are typing gets a warning when it breaks a rule, for example a 4th line in a row. Click "line N" to jump to it. Manual items are checkboxes. Hints only; nothing is blocked. Limits live at the top of `rules.js`.
 - **Copy for LinkedIn:** copies the post. Paste it into LinkedIn and the styling stays.
 
 ## How styling survives paste

@@ -46,7 +46,21 @@
       <div id="picker" class="panel picker" hidden></div>
 
       <textarea id="text" placeholder="Write your post…" spellcheck="true"></textarea>
-      <div class="meta"><span id="count">0</span> / 3000 characters</div>
+      <div class="meta-row">
+        <div id="now" class="now" aria-live="polite"></div>
+        <div class="meta"><span id="count">0</span> / 3000 characters</div>
+      </div>
+
+      <details id="rules" class="panel rules" open>
+        <summary>Jay's LinkedIn rules <span id="rule-count" class="badge"></span></summary>
+        <ul id="auto-rules" class="rule-list"></ul>
+        <div class="group">Check yourself</div>
+        <ul id="manual-rules" class="rule-list"></ul>
+        <div class="row">
+          <button type="button" id="reset-manual">Uncheck all</button>
+          <span class="hint">Hints only. Nothing is blocked.</span>
+        </div>
+      </details>
     </section>
 
     <!-- RIGHT: preview -->
@@ -87,6 +101,7 @@
   <div id="toast" class="toast" hidden></div>
 
   <script src="format.js"></script>
+  <script src="rules.js"></script>
   <script src="emojis.js"></script>
   <script src="app.js"></script>
 </body>

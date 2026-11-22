@@ -55,6 +55,81 @@
   });
 
   ta.addEventListener('input', update);
+  for (const ev of ['keyup', 'click', 'select']) ta.addEventListener(ev, showNow);
+
+  // ---------- Jay's rules ----------
+  let lineIssues = {};
+
+  function lineStart(i) {
+    let pos = 0;
+    const ls = ta.value.split('\n');
+    for (let k = 0; k < i; k++) pos += ls[k].length + 1;
+    return [pos, pos + (ls[i] || '').length];
+  }
+
+  // Live hint for the line the caret is on.
+  function showNow() {
+    const i = ta.value.slice(0, ta.selectionStart).split('\n').length - 1;
+    const msgs = lineIssues[i] || [];
+    $('#now').textContent = msgs.length ? '⚠ ' + msgs.join(' ') : '';
+    ta.classList.toggle('warn', msgs.length > 0);
+  }
+
+  function runRules() {
+    const { rules, lineIssues: li } = Rules.check(Fmt.plain(ta.value));
+    lineIssues = li;
+    const warns = rules.filter(r => r.status === 'warn').length;
+    $('#rule-count').textContent = rules.length ? (warns ? `${warns} to fix` : 'all good') : '';
+    $('#rule-count').className = 'badge ' + (warns ? 'warn' : 'ok');
+    const ul = $('#auto-rules');
+    ul.innerHTML = '';
+    if (!rules.length) {
+      ul.innerHTML = '<li class="hint">Start writing to see checks.</li>';
+    }
+    for (const r of rules) {
+      const li = document.createElement('li');
+      li.className = r.status;
+      const icon = { ok: '✓', warn: '⚠', info: 'ℹ' }[r.status];
+      li.innerHTML = `<span class="ic">${icon}</span><span><b></b> <span class="d"></span></span>`;
+      li.querySelector('b').textContent = r.label;
+      li.querySelector('.d').textContent = r.detail;
+      if (r.lines.length) {
+        const jump = document.createElement('button');
+        jump.type = 'button';
+        jump.className = 'jump';
+        jump.textContent = 'line ' + r.lines.map(n => n + 1).join(', ');
+        jump.title = 'Select this line in the editor';
+        jump.addEventListener('click', () => {
+          ta.focus();
+          ta.setSelectionRange(...lineStart(r.lines[0]));
+          showNow();
+        });
+        li.querySelector('span:last-child').append(' ', jump);
+      }
+      ul.appendChild(li);
+    }
+    showNow();
+  }
+
+  let manual = store.get('manual', []);
+  function renderManual() {
+    const ul = $('#manual-rules');
+    ul.innerHTML = '';
+    Rules.MANUAL.forEach((m, i) => {
+      const li = document.createElement('li');
+      const id = 'manual-' + i;
+      li.innerHTML = `<input type="checkbox" id="${id}"><label for="${id}"></label>`;
+      li.querySelector('label').textContent = m;
+      const cb = li.querySelector('input');
+      cb.checked = manual.includes(i);
+      cb.addEventListener('change', () => {
+        manual = cb.checked ? [...manual, i] : manual.filter(x => x !== i);
+        store.set('manual', manual);
+      });
+      ul.appendChild(li);
+    });
+  }
+  $('#reset-manual').addEventListener('click', () => { manual = []; store.set('manual', manual); renderManual(); });
 
   // ---------- Emojis ----------
   const DEFAULT_FAVS = ['🚀', '💡', '✅', '👉', '👇', '🔥', '📌', '🎯', '💪', '🙌', '📈', '✨', '🤝', '❤️', '👏', '→', '•'];
@@ -142,6 +217,7 @@
     $('#count').textContent = t.length;
     $('#count').parentElement.classList.toggle('over', t.length > 3000);
     store.set('draft', t);
+    runRules();
     layoutSeeMore();
   }
 
@@ -216,5 +292,6 @@
   // ---------- Init ----------
   ta.value = store.get('draft', '');
   renderFavs();
+  renderManual();
   update();
 })();
