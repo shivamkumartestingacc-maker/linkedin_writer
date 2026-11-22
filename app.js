@@ -81,7 +81,7 @@
     const warns = rules.filter(r => r.status === 'warn').length;
     $('#rule-count').textContent = rules.length ? (warns ? `${warns} to fix` : 'all good') : '';
     $('#rule-count').className = 'badge ' + (warns ? 'warn' : 'ok');
-    const pass = rules.filter(r => r.status === 'ok').length;
+    const pass = rules.filter(r => r.status !== 'warn').length;  // info items aren't failures
     $('#progress-text').innerHTML = rules.length ? `Rules <b>${pass} of ${rules.length}</b> passing` : '';
     $('#progress-bars').innerHTML = rules.map(r => `<i class="${r.status}"></i>`).join('');
     const ul = $('#auto-rules');
@@ -259,17 +259,62 @@
     img.hidden = true; $('#img-remove').hidden = true; $('#img').value = '';
   });
 
-  // Profile fields persist.
+  // Profile: saved edits win, then window.PROFILE defaults, then placeholders.
+  const P = window.PROFILE || {};
+  const initial = () => { $('#avatar-initial').textContent = ($('#name').textContent.trim()[0] || 'Y').toUpperCase(); };
   for (const id of ['name', 'headline']) {
     const el = $('#' + id);
-    el.textContent = store.get(id, el.textContent);
-    el.addEventListener('input', () => {
-      store.set(id, el.textContent);
-      if (id === 'name') $('#avatar').textContent = (el.textContent.trim()[0] || 'Y').toUpperCase();
-    });
+    const placeholder = el.textContent;
+    const saved = store.get(id, null);
+    el.textContent = saved && saved !== placeholder ? saved : (P[id] || placeholder);
+    el.addEventListener('input', () => { store.set(id, el.textContent); if (id === 'name') initial(); });
     el.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } });
   }
-  $('#avatar').textContent = ($('#name').textContent.trim()[0] || 'Y').toUpperCase();
+  initial();
+  const avatarImg = $('#avatar-img');
+  function showAvatar(src) {
+    avatarImg.hidden = !src;
+    $('#avatar-initial').hidden = !!src;
+    if (src) avatarImg.src = src;
+  }
+  showAvatar(store.get('avatar', null) || P.avatar);
+  // Photo is shrunk to 160px so it fits in browser storage.
+  $('#avatar-file').addEventListener('change', e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const im = new Image();
+    im.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = c.height = 160;
+      const s = Math.min(im.width, im.height);
+      c.getContext('2d').drawImage(im, (im.width - s) / 2, (im.height - s) / 2, s, s, 0, 0, 160, 160);
+      const url = c.toDataURL('image/jpeg', 0.85);
+      URL.revokeObjectURL(im.src);
+      store.set('avatar', url);
+      showAvatar(url);
+    };
+    im.src = URL.createObjectURL(f);
+  });
+
+  // ---------- Theme ----------
+  const root = document.documentElement;
+  const isDark = () => (root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark';
+  function applyTheme(t) {
+    if (t) root.dataset.theme = t;
+    $('#theme').textContent = isDark() ? '☀ Light' : '☾ Dark';
+  }
+  applyTheme(store.get('theme', null));
+  $('#theme').addEventListener('click', () => {
+    const t = isDark() ? 'light' : 'dark';
+    store.set('theme', t);
+    applyTheme(t);
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => applyTheme());
+
+  // Rules list open/closed is remembered.
+  const rulesBox = $('#rules');
+  rulesBox.open = store.get('rules-open', true);
+  rulesBox.addEventListener('toggle', () => store.set('rules-open', rulesBox.open));
 
   // ---------- Copy ----------
   // The text already holds the Unicode styled characters, so a plain-text copy
