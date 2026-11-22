@@ -107,20 +107,46 @@ body.resizing { cursor: col-resize; user-select: none; }
   background: var(--paper);
   display: flex; flex-direction: column; gap: 14px;
 }
-.toolbar, .emoji-bar, .row, .preview-controls { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-.toolbar button { min-width: 36px; }
+.toolbar, .row, .preview-controls { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+
+/* Formatting toolbar: one box, flat buttons inside. */
+.toolbar { gap: 2px; padding: 4px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+.toolbar button {
+  border: none; background: none; border-radius: 6px; min-width: 32px; height: 32px; padding: 0 10px;
+  color: var(--text); font-weight: 600;
+}
+.toolbar button:hover { background: var(--hover); }
+
+/* Emoji box: label + actions on top, favourites grid, then edit / picker sections. */
+.emoji-box { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+.box-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 6px 2px 12px; }
+.box-label { font-size: 12px; font-weight: 600; color: var(--muted); }
+.box-actions { display: flex; gap: 2px; }
+.text-btn { border: none; background: none; padding: 4px 8px; border-radius: 6px; font-size: 13px; font-weight: 600; color: var(--strong); }
+.text-btn:hover { background: var(--hover); color: var(--strong); }
+.text-btn.on { background: var(--strong); color: var(--on-strong); box-shadow: none; }
+.box-section { border-top: 1px solid var(--line); padding: 10px 12px; }
 .sep { width: 1px; height: 20px; background: var(--line); margin: 0 4px; }
-.favs { display: flex; flex-wrap: wrap; gap: 2px; flex: 1; }
-.favs button, .grid button { border: none; background: none; font-size: 19px; padding: 3px 5px; line-height: 1.2; border-radius: 8px; }
+.favs, .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(36px, 1fr)); gap: 2px; }
+.favs { padding: 2px 6px 8px; }
+.favs button, .grid button {
+  position: relative; height: 36px; padding: 0; border: none; background: none; border-radius: 6px;
+  font-size: 20px; line-height: 1; color: var(--text);
+}
 .favs button:hover, .grid button:hover { background: var(--hover); }
-.favs.editing button { outline: 1px dashed var(--danger); cursor: grab; }
-.favs.editing button:hover { background: var(--danger-bg); }
+.favs.editing { gap: 10px 8px; padding: 8px 10px 12px; }
+.favs.editing button { cursor: grab; background: var(--field); box-shadow: 0 0 0 1px var(--line); }
+.favs.editing button::after {
+  content: "×"; position: absolute; top: -4px; right: -4px; width: 15px; height: 15px; border-radius: 50%;
+  background: var(--muted); color: var(--paper); font-size: 11px; line-height: 15px; font-weight: 600;
+}
+.favs.editing button:hover::after { background: var(--danger); }
 .favs button.dragging { opacity: .4; }
-.favs button.drop-target { outline: 2px solid var(--strong); }
+.favs button.drop-target { box-shadow: 0 0 0 2px var(--strong); }
 .panel { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; background: var(--panel); }
-.picker { max-height: 240px; overflow: auto; }
+.picker { max-height: 260px; overflow: auto; padding-top: 0; }
+.picker .group { position: sticky; top: 0; background: var(--panel); padding: 8px 0 4px; margin: 0; z-index: 1; }
 .group { font-size: 11px; color: var(--muted); margin: 10px 0 4px; letter-spacing: .04em; text-transform: uppercase; }
-.grid { display: flex; flex-wrap: wrap; }
 .row input {
   flex: 1; min-width: 120px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 10px;
   font: inherit; background: var(--field); color: var(--text);

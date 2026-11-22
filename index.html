@@ -27,22 +27,27 @@
         <button id="clear" title="Remove formatting from selection">Clear</button>
       </div>
 
-      <div class="emoji-bar">
+      <section class="emoji-box" aria-label="Emojis">
+        <div class="box-head">
+          <span class="box-label">Favourite emojis</span>
+          <div class="box-actions">
+            <button id="edit-favs" class="text-btn" type="button" title="Edit favourites">Edit</button>
+            <button id="more-emoji" class="text-btn" type="button" title="All emojis">All emojis ▾</button>
+          </div>
+        </div>
         <div id="favs" class="favs" aria-label="Favourite emojis"></div>
-        <button id="edit-favs" title="Edit favourites">Edit</button>
-        <button id="more-emoji" title="All emojis">More ▾</button>
-      </div>
 
-      <div id="fav-editor" class="panel" hidden>
-        <p class="hint">Drag favourites to reorder. Click one to remove it. Click any emoji below to add it. Or add your own text/symbol:</p>
-        <form id="add-fav" class="row">
-          <input id="fav-input" placeholder="e.g. → or ✔️ or 👉🏻" maxlength="20">
-          <button>Add</button>
-          <button type="button" id="reset-favs">Reset defaults</button>
-        </form>
-      </div>
+        <div id="fav-editor" class="box-section" hidden>
+          <p class="hint">Drag to reorder. Click × to remove. Pick from all emojis below to add, or type your own:</p>
+          <form id="add-fav" class="row">
+            <input id="fav-input" placeholder="e.g. → or ✔️ or 👉🏻" maxlength="20">
+            <button>Add</button>
+            <button type="button" id="reset-favs" class="text-btn">Reset defaults</button>
+          </form>
+        </div>
 
-      <div id="picker" class="panel picker" hidden></div>
+        <div id="picker" class="box-section picker" hidden></div>
+      </section>
 
       <textarea id="text" placeholder="Write your post…" spellcheck="true"></textarea>
       <div class="meta-row">

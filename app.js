@@ -181,14 +181,18 @@
     $('#edit-favs').textContent = editing ? 'Done' : 'Edit';
     $('#edit-favs').classList.toggle('on', editing);
     $('#fav-editor').hidden = !editing;
-    if (editing) $('#picker').hidden = false;
+    showPicker(editing || !$('#picker').hidden);
     renderFavs();
   });
   $('#add-fav').addEventListener('submit', e => {
     e.preventDefault(); addFav($('#fav-input').value); $('#fav-input').value = '';
   });
   $('#reset-favs').addEventListener('click', () => { favs = [...DEFAULT_FAVS]; saveFavs(); });
-  $('#more-emoji').addEventListener('click', () => { $('#picker').hidden = !$('#picker').hidden; });
+  function showPicker(on) {
+    $('#picker').hidden = !on;
+    $('#more-emoji').textContent = on ? 'All emojis ▴' : 'All emojis ▾';
+  }
+  $('#more-emoji').addEventListener('click', () => showPicker($('#picker').hidden));
 
   // Built once; clicking inserts, or adds to favourites while editing.
   const picker = $('#picker');
