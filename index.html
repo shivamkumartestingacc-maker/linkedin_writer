@@ -92,8 +92,13 @@
           <button data-device="desktop" class="on">Desktop</button>
           <button data-device="mobile">Mobile</button>
         </div>
-        <label class="file">Image <input id="img" type="file" accept="image/*"></label>
-        <button id="img-remove" hidden>Remove image</button>
+        <div class="seg" role="group" aria-label="Image">
+          <button data-img="none">No image</button>
+          <button data-img="portrait">Portrait</button>
+          <button data-img="landscape" class="on">Landscape</button>
+        </div>
+        <label class="file">Upload <input id="img" type="file" accept="image/*"></label>
+        <button id="img-remove" class="text-btn" hidden>Use sample</button>
       </div>
 
       <article id="card" class="card desktop">
@@ -117,6 +122,7 @@
         <div class="body-wrap">
           <div id="body" class="body collapsed"></div>
           <button id="see-more" class="see-more" hidden>…more</button>
+          <button id="see-less" class="see-less" hidden>…see less</button>
         </div>
         <img id="post-img" alt="" hidden>
         <div class="actions" aria-hidden="true">
