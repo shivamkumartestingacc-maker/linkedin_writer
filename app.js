@@ -296,6 +296,38 @@
     im.src = URL.createObjectURL(f);
   });
 
+  // ---------- Resizable split ----------
+  // Left column width in %, kept between 25 and 75. Saved per browser.
+  const split = $('.split'), divider = $('#divider');
+  const setLeft = pct => {
+    pct = Math.min(75, Math.max(25, pct));
+    split.style.setProperty('--left', pct + '%');
+    divider.setAttribute('aria-valuenow', Math.round(pct));
+    layoutSeeMore();
+    return pct;
+  };
+  let leftPct = setLeft(store.get('left', 50));
+  divider.addEventListener('pointerdown', e => {
+    divider.setPointerCapture(e.pointerId);
+    divider.classList.add('dragging');
+    document.body.classList.add('resizing');
+  });
+  divider.addEventListener('pointermove', e => {
+    if (!divider.hasPointerCapture(e.pointerId)) return;
+    const r = split.getBoundingClientRect();
+    leftPct = setLeft((e.clientX - r.left) / r.width * 100);
+  });
+  divider.addEventListener('pointerup', () => {
+    divider.classList.remove('dragging');
+    document.body.classList.remove('resizing');
+    store.set('left', leftPct);
+  });
+  divider.addEventListener('dblclick', () => store.set('left', leftPct = setLeft(50)));
+  divider.addEventListener('keydown', e => {
+    const step = { ArrowLeft: -2, ArrowRight: 2 }[e.key];
+    if (step) { e.preventDefault(); store.set('left', leftPct = setLeft(leftPct + step)); }
+  });
+
   // ---------- Theme ----------
   const root = document.documentElement;
   const isDark = () => (root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark';

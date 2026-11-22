@@ -69,7 +69,7 @@ button.primary:hover { opacity: .88; background: var(--strong); color: var(--on-
 /* Shell */
 /* Full screen: two columns fill the window, each scrolls on its own. */
 .split {
-  display: grid; grid-template-columns: 1fr 1fr;
+  display: grid; grid-template-columns: minmax(0, var(--left, 50%)) 9px minmax(0, 1fr);
   height: 100vh; height: 100dvh;
   background: var(--shell);
   -webkit-backdrop-filter: blur(28px) saturate(1.2);
@@ -83,6 +83,7 @@ button.primary:hover { opacity: .88; background: var(--strong); color: var(--on-
 }
 @media (max-width: 900px) {
   .split { grid-template-columns: 1fr; height: auto; }
+  .divider { display: none; }
   .pane { overflow: visible; }
 }
 @media (max-width: 600px) { .pane { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); } }
@@ -92,14 +93,19 @@ button.primary:hover { opacity: .88; background: var(--strong); color: var(--on-
 .caption b { font-weight: 500; color: var(--text); }
 .hint { color: var(--muted); font-size: 12px; margin: 4px 0; }
 
+/* Draggable divider: a 1px line with a wider grab area. */
+.divider {
+  position: relative; cursor: col-resize; touch-action: none; margin: 0 -4px; z-index: 2;
+}
+.divider::before { content: ""; position: absolute; top: 0; bottom: 0; left: calc(50% - 0.5px); width: 1px; background: var(--line); transition: background .15s; }
+.divider:hover::before, .divider:focus-visible::before, .divider.dragging::before { background: var(--strong); left: calc(50% - 1px); width: 2px; }
+.divider:focus-visible { outline: none; }
+body.resizing { cursor: col-resize; user-select: none; }
+
 /* Editor sheet */
 .editor {
   background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  margin: 16px 0 16px 16px;
   display: flex; flex-direction: column; gap: 14px;
-  box-shadow: var(--soft);
 }
 .toolbar, .emoji-bar, .row, .preview-controls { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .toolbar button { min-width: 36px; }
@@ -163,7 +169,7 @@ textarea.warn, textarea.warn:focus { border-color: var(--warn); }
 /* Preview side */
 /* Everything on the preview side shares one 555px column (LinkedIn's feed width),
    and its top lines up with the editor card's title. */
-.preview-pane { display: flex; flex-direction: column; gap: 16px; align-items: center; padding-top: 40px; padding-bottom: 0; }
+.preview-pane { display: flex; flex-direction: column; gap: 16px; align-items: center; padding-bottom: 0; }
 .preview-pane > * { width: 100%; max-width: 555px; }
 .preview-pane > .card.mobile { max-width: 360px; }
 .preview-pane > .hint { margin: -8px 0 0; text-align: center; }
