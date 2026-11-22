@@ -99,6 +99,7 @@
         return;
       }
     }
+    if (e.altKey && e.key === 'ArrowDown') { e.preventDefault(); focusFav(0); return; }
     if (!(e.ctrlKey || e.metaKey)) return;
     const k = { b: 'bold', i: 'italic', u: 'underline' }[e.key.toLowerCase()];
     if (k) { e.preventDefault(); replaceSelection(t => Fmt.toggle(t, k)); }
@@ -213,6 +214,7 @@
     favs.forEach((f, i) => {
       const b = document.createElement('button');
       b.textContent = f;
+      b.tabIndex = -1;  // reached with Option/Alt+Down, then arrow keys
       b.title = editing ? 'Drag to move, click to remove' : 'Insert';
       if (editing) {
         b.draggable = true;
@@ -234,6 +236,42 @@
       box.appendChild(b);
     });
   }
+  // Keyboard: Option/Alt+Down in the text jumps into the favourites. Arrows move,
+  // Enter drops the emoji at the cursor, Esc (or Up from the first row) goes back to the text.
+  const favBox = $('#favs');
+  function focusFav(i) {
+    const btns = [...favBox.children];
+    if (!btns.length) return;
+    i = Math.max(0, Math.min(btns.length - 1, i));
+    btns.forEach((b, k) => b.classList.toggle('kbd', k === i));
+    favBox.classList.add('kbd-nav');
+    btns[i].focus();
+  }
+  function leaveFavs() {
+    favBox.classList.remove('kbd-nav');
+    [...favBox.children].forEach(b => b.classList.remove('kbd'));
+    ta.focus();
+  }
+  favBox.addEventListener('keydown', e => {
+    const btns = [...favBox.children];
+    const i = btns.indexOf(document.activeElement);
+    if (i < 0) return;
+    const cols = btns.filter(b => b.offsetTop === btns[0].offsetTop).length || 1;
+    const move = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -cols, ArrowDown: cols }[e.key];
+    if (move !== undefined) {
+      e.preventDefault();
+      if (e.key === 'ArrowUp' && i < cols) return leaveFavs();
+      return focusFav(i + move);
+    }
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (editing) return;
+      leaveFavs();
+      insert(btns[i].textContent);
+    } else if (e.key === 'Escape' || e.key === 'Tab') { e.preventDefault(); leaveFavs(); }
+  });
+  favBox.addEventListener('focusout', e => { if (!favBox.contains(e.relatedTarget)) favBox.classList.remove('kbd-nav'); });
+
   function saveFavs() { store.set('favs', favs); renderFavs(); }
   function addFav(f) {
     f = f.trim();
