@@ -288,3 +288,40 @@ textarea.warn, textarea.warn:focus { border-color: var(--warn); }
 .toast[hidden] { display: none; }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* ---------- Notion-style editor: no boxes, thin dividers, quiet tools ---------- */
+.editor { padding-top: 48px; padding-left: max(48px, env(safe-area-inset-left, 0px)); padding-right: 48px; gap: 12px; }
+.editor > * { width: 100%; max-width: 720px; margin-inline: auto; }
+@media (max-width: 600px) { .editor { padding: 24px max(16px, env(safe-area-inset-left, 0px)); } }
+.editor .pane-head { flex-direction: column; align-items: flex-start; gap: 4px; margin-bottom: 8px; }
+.editor .pane-head .title { font-size: 32px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; }
+
+/* Tools sit on the page: no borders, gray until hovered. */
+.toolbar { border: none; background: none; padding: 0; margin-left: -6px; }
+.toolbar button { color: var(--muted); border-radius: 4px; height: 28px; min-width: 28px; padding: 0 8px; }
+.toolbar button:hover { color: var(--text); }
+.toolbar .sep { height: 16px; }
+
+.emoji-box { border: none; background: none; border-bottom: 1px solid var(--line); padding-bottom: 10px; border-radius: 0; }
+.box-head { padding: 0 0 2px; }
+.box-label { font-weight: 500; }
+.text-btn { color: var(--muted); font-weight: 500; border-radius: 4px; }
+.text-btn:hover { color: var(--text); }
+.text-btn.on { background: var(--hover); color: var(--text); }
+.favs { padding: 0; margin-left: -4px; }
+.favs button { border-radius: 4px; }
+.favs.editing { padding: 8px 4px 4px; }
+.box-section { border-top: none; padding: 10px 0 0; }
+.picker .group { background: var(--paper); }
+#fav-editor .row input { background: var(--hover); border-color: transparent; border-radius: 4px; }
+
+/* Writing area: plain page text, lined up with the tools. Rule warnings show in the line below it. */
+textarea {
+  border: none; border-radius: 0; box-shadow: none; background: transparent;
+  padding: 4px 0; font-size: 16px; line-height: 1.75; min-height: 320px; resize: none; overflow: hidden;
+}
+textarea:focus, textarea.warn, textarea.warn:focus { border: none; }
+.meta-row { border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-top: 0; }
+
+.rules { padding-top: 0; }
+.rules-title { font-size: 18px; font-weight: 600; }

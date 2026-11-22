@@ -224,6 +224,9 @@
     $('#count').textContent = t.length;
     $('#count').parentElement.classList.toggle('over', t.length > 3000);
     store.set('draft', t);
+    // Grow with the text, like a page (the column scrolls, not the box).
+    ta.style.height = 'auto';
+    ta.style.height = ta.scrollHeight + 'px';
     runRules();
     layoutSeeMore();
   }
