@@ -254,27 +254,16 @@
   }));
   window.addEventListener('resize', layoutSeeMore);
 
-  // Image: a drawn sample in the chosen shape, or your own upload (stays on your computer).
+  // Image: an editable sample graphic in the chosen shape, or your own upload (stays on your computer).
   const img = $('#post-img');
-  const sample = (w, h) => 'data:image/svg+xml,' + encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}">
-      <defs><linearGradient id="s" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#8fb3d9"/><stop offset=".55" stop-color="#f2c6a0"/><stop offset="1" stop-color="#e59a76"/>
-      </linearGradient></defs>
-      <rect width="${w}" height="${h}" fill="url(#s)"/>
-      <circle cx="${w * .7}" cy="${h * .45}" r="${Math.min(w, h) * .12}" fill="#fff3dc" opacity=".9"/>
-      <path d="M0 ${h * .72} Q${w * .25} ${h * .55} ${w * .5} ${h * .7} T${w} ${h * .66} V${h} H0Z" fill="#6f8a7a"/>
-      <path d="M0 ${h * .82} Q${w * .3} ${h * .7} ${w * .6} ${h * .84} T${w} ${h * .8} V${h} H0Z" fill="#4c6458"/>
-      <text x="${w / 2}" y="${h * .94}" font-family="system-ui, sans-serif" font-size="${Math.min(w, h) * .045}" fill="#fff" opacity=".85" text-anchor="middle">Sample ${w > h ? 'landscape 1.91:1' : 'portrait 4:5'}</text>
-    </svg>`);
-  const SAMPLES = { landscape: sample(1200, 628), portrait: sample(1080, 1350) };
   let imgMode = store.get('img-mode', 'landscape');
   let uploaded = null;
   function showImage() {
     $('#card').dataset.img = imgMode;
     document.querySelectorAll('[data-img]').forEach(b => b.classList.toggle('on', b.dataset.img === imgMode));
-    img.hidden = imgMode === 'none';
-    if (!img.hidden) img.src = uploaded || SAMPLES[imgMode];
+    img.hidden = imgMode === 'none' || !uploaded;
+    if (!img.hidden) img.src = uploaded;
+    $('#sample-img').hidden = imgMode === 'none' || !!uploaded;
     $('#img-remove').hidden = !uploaded;
   }
   document.querySelectorAll('[data-img]').forEach(b => b.addEventListener('click', () => {
@@ -296,7 +285,7 @@
   // Profile: saved edits win, then window.PROFILE defaults, then placeholders.
   const P = window.PROFILE || {};
   const initial = () => { $('#avatar-initial').textContent = ($('#name').textContent.trim()[0] || 'Y').toUpperCase(); };
-  for (const id of ['name', 'headline']) {
+  for (const id of ['name', 'headline', 'sample-text']) {
     const el = $('#' + id);
     const placeholder = el.textContent;
     const saved = store.get(id, null);
