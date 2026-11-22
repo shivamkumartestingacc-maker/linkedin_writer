@@ -167,11 +167,6 @@ textarea.warn, textarea.warn:focus { border-color: var(--warn); }
 .preview-pane > * { width: 100%; max-width: 555px; }
 .preview-pane > .card.mobile { max-width: 360px; }
 .preview-pane > .hint { margin: -8px 0 0; text-align: center; }
-.feed-below { display: flex; flex-direction: column; gap: 8px; }
-.feed-below:empty { display: none; }
-.demo-label { font-size: 12px; color: var(--muted); margin: 0; }
-.counts { display: flex; justify-content: space-between; padding: 0 16px 8px; font-size: 12px; color: var(--li-muted); }
-.counts .num { font-size: 13px; margin-left: 4px; }
 .who { display: flex; gap: 12px; align-items: center; }
 .head-actions { display: flex; gap: 8px; align-items: center; }
 .seg { display: inline-flex; gap: 6px; }
