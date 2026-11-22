@@ -229,13 +229,7 @@ textarea.warn, textarea.warn:focus { border-color: var(--warn); }
 .heart { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #df704d; }
 
 /* Step-style progress, like "Step 1 of 4" */
-/* Pinned to the bottom of the preview column, like a step indicator. */
-.progress {
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
-  position: sticky; bottom: 0; margin-top: auto;
-  padding: 12px 0 calc(16px + env(safe-area-inset-bottom, 0px));
-  background: linear-gradient(to bottom, transparent, var(--sky) 30%);
-}
+.progress { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 8px; padding-bottom: 24px; }
 .bars { display: flex; gap: 5px; }
 .bars i { width: 18px; height: 2px; border-radius: 2px; background: var(--faint); opacity: .5; }
 .bars i.ok, .bars i.info { background: var(--strong); opacity: 1; }
