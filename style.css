@@ -40,6 +40,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { min-height: 100%; background: var(--sky) fixed; }
 body {
   margin: 0;
@@ -365,3 +366,47 @@ textarea:focus, textarea.warn, textarea.warn:focus { border: none; outline: none
 
 .meta-row { margin-top: -4px; }
 .now:empty { display: none; }
+
+/* ---------- Spelling ---------- */
+/* The mirror (.hl) sits behind the transparent text area with identical text metrics,
+   so its wavy underlines land exactly under the misspelled words. */
+.write-area { position: relative; }
+.write-area textarea { position: relative; z-index: 1; display: block; width: 100%; }
+.hl {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  padding: 14px 12px; font-size: 16px; line-height: 1.7; font-family: inherit; letter-spacing: normal;
+  white-space: pre-wrap; overflow-wrap: break-word; word-break: normal; color: transparent; overflow: hidden;
+}
+.hl mark {
+  background: none; color: transparent;
+  text-decoration: underline wavy var(--danger); text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px; text-decoration-skip-ink: none;
+}
+.spell-pop {
+  position: absolute; z-index: 7; display: flex; flex-wrap: wrap; gap: 4px; align-items: center;
+  max-width: 340px; padding: 6px; background: var(--raised); border-radius: 12px;
+  box-shadow: 0 0 0 1px var(--line), 0 12px 32px -12px rgba(0, 0, 0, .35);
+}
+.sugg {
+  border: none; background: var(--hover); color: var(--text); font-weight: 600;
+  border-radius: 8px; padding: 4px 10px; font-size: 14px;
+}
+.sugg:hover { background: var(--strong); color: var(--on-strong); }
+.text-btn.ignore { color: var(--muted); }
+.spell-pill {
+  display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px; margin-left: 4px;
+  border: none; border-radius: 999px; background: var(--danger-bg); color: var(--danger);
+  font-size: 12px; font-weight: 600;
+}
+.spell-pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.spell-pill:hover, .spell-pill[aria-expanded="true"] { background: var(--danger); color: var(--paper); }
+.spell-pill[hidden] { display: none; }
+.spell-panel { display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow: auto; }
+.spell-head { display: flex; align-items: center; justify-content: space-between; }
+.spell-head .pop-label { margin: 0; }
+.spell-row { display: flex; gap: 10px; align-items: baseline; }
+.spell-row .wrong {
+  flex: 0 0 auto; min-width: 90px; color: var(--danger); font-weight: 600;
+  text-decoration: line-through; text-decoration-thickness: 1px;
+}
+.sugg-list { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; min-width: 0; }

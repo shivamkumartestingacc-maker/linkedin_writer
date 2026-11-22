@@ -354,6 +354,7 @@
     ta.style.height = 'auto';
     ta.style.height = ta.scrollHeight + 'px';
     runRules();
+    queueSpell();
     layoutSeeMore();
   }
 
@@ -521,6 +522,142 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => { el.hidden = true; }, 1800);
   }
+
+  // ---------- Spelling ----------
+  // Wavy underline via a mirror layer behind the (transparent) text area. Click a marked
+  // word for suggestions. The pill in the bottom bar counts mistakes and opens a fix-all list.
+  const hl = $('#hl'), spop = $('#spell-pop'), spanel = $('#spell-panel'), pill = $('#spell-pill');
+  let misses = [], spellTimer;
+  let ignored = store.get('spell-ignore', []);
+
+  function queueSpell() { clearTimeout(spellTimer); spellTimer = setTimeout(runSpell, 250); }
+
+  function runSpell() {
+    if (!window.Spell || !Spell.ready()) return;
+    const t = ta.value;
+    misses = Spell.find(t, Fmt.plain, ignored);
+    let html = '', at = 0;
+    misses.forEach((m, i) => {
+      html += esc(t.slice(at, m.start)) + `<mark data-i="${i}">${esc(m.word)}</mark>`;
+      at = m.end;
+    });
+    hl.innerHTML = html + esc(t.slice(at)) + '\n';
+    const n = misses.length;
+    pill.hidden = n === 0;
+    pill.textContent = `${n} spelling`;
+    pill.title = n ? 'See and fix spelling mistakes' : '';
+    if (!n) showPanel(false);
+    else if (!spanel.hidden) renderPanel();
+    if (!spop.hidden) hidePop();
+  }
+
+  // Replace text ranges in one step so a single Undo brings them back.
+  function replaceRanges(ranges) {
+    if (!ranges.length) return;
+    let t = ta.value;
+    [...ranges].sort((a, b) => b.start - a.start).forEach(r => { t = t.slice(0, r.start) + r.text + t.slice(r.end); });
+    const caret = ta.selectionStart;
+    ta.focus();
+    ta.setSelectionRange(0, ta.value.length);
+    if (!document.execCommand('insertText', false, t)) ta.value = t;
+    ta.setSelectionRange(Math.min(caret, t.length), Math.min(caret, t.length));
+    update();
+  }
+  const fixWord = (plainWord, suggestion) => replaceRanges(
+    misses.filter(m => m.plain.toLowerCase() === plainWord.toLowerCase())
+      .map(m => ({ start: m.start, end: m.end, text: Fmt.restyle(m.word, suggestion) })));
+  function ignoreWord(plainWord) {
+    ignored = [...ignored, plainWord.toLowerCase()];
+    store.set('spell-ignore', ignored);
+    runSpell();
+  }
+
+  function suggestionButtons(m, box, after, n = 5) {
+    const sugs = Spell.suggest(m.plain, n);
+    if (!sugs.length) box.insertAdjacentHTML('beforeend', '<span class="hint">No suggestions</span>');
+    sugs.forEach(s => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'sugg'; b.textContent = s;
+      b.addEventListener('click', () => { fixWord(m.plain, s); after && after(); });
+      box.appendChild(b);
+    });
+    const ig = document.createElement('button');
+    ig.type = 'button'; ig.className = 'text-btn ignore'; ig.textContent = 'Ignore';
+    ig.title = 'Treat this word as correct from now on';
+    ig.addEventListener('click', () => { ignoreWord(m.plain); after && after(); });
+    box.appendChild(ig);
+    return sugs;
+  }
+
+  // Popover under a misspelled word, when the cursor is placed in it.
+  function hidePop() { spop.hidden = true; }
+  function showPopAtCaret() {
+    const pos = ta.selectionStart;
+    if (ta.selectionEnd !== pos) return hidePop();
+    const i = misses.findIndex(m => pos >= m.start && pos <= m.end);
+    if (i < 0) return hidePop();
+    const mark = hl.querySelector(`mark[data-i="${i}"]`);
+    if (!mark) return hidePop();
+    spop.innerHTML = '';
+    suggestionButtons(misses[i], spop, hidePop);
+    spop.hidden = false;
+    const area = spop.parentElement.getBoundingClientRect(), r = mark.getBoundingClientRect();
+    const left = Math.max(0, Math.min(r.left - area.left, area.width - spop.offsetWidth));
+    spop.style.left = left + 'px';
+    spop.style.top = (r.bottom - area.top + 4) + 'px';
+  }
+  ta.addEventListener('click', showPopAtCaret);
+  ta.addEventListener('keyup', e => { if (e.key.startsWith('Arrow') || e.key === 'Home' || e.key === 'End') showPopAtCaret(); });
+  ta.addEventListener('input', hidePop);
+  document.addEventListener('click', e => { if (!spop.hidden && e.target !== ta && !spop.contains(e.target)) hidePop(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') hidePop(); });
+
+  // Fix-all panel: one row per wrong word, with suggestions.
+  function renderPanel() {
+    spanel.innerHTML = '';
+    const groups = new Map();
+    misses.forEach(m => {
+      const k = m.plain.toLowerCase();
+      if (!groups.has(k)) groups.set(k, { m, n: 0 });
+      groups.get(k).n++;
+    });
+    const head = document.createElement('div');
+    head.className = 'spell-head';
+    head.innerHTML = `<span class="pop-label">Spelling: ${misses.length} to fix</span>`;
+    const all = document.createElement('button');
+    all.type = 'button'; all.className = 'text-btn'; all.textContent = 'Fix all';
+    all.title = 'Use the first suggestion for every word';
+    head.appendChild(all);
+    spanel.appendChild(head);
+    const firsts = [];
+    for (const { m, n } of groups.values()) {
+      const row = document.createElement('div');
+      row.className = 'spell-row';
+      row.innerHTML = `<span class="wrong"></span>`;
+      row.querySelector('.wrong').textContent = m.word + (n > 1 ? ` ×${n}` : '');
+      const box = document.createElement('div');
+      box.className = 'sugg-list';
+      const sugs = suggestionButtons(m, box, null, 3);
+      if (sugs[0]) firsts.push([m.plain, sugs[0]]);
+      row.appendChild(box);
+      spanel.appendChild(row);
+    }
+    all.addEventListener('click', () => replaceRanges(misses.flatMap(m => {
+      const f = firsts.find(([p]) => p.toLowerCase() === m.plain.toLowerCase());
+      return f ? [{ start: m.start, end: m.end, text: Fmt.restyle(m.word, f[1]) }] : [];
+    })));
+  }
+  function showPanel(on) {
+    spanel.hidden = !on;
+    pill.setAttribute('aria-expanded', on);
+    if (on) renderPanel();
+  }
+  pill.addEventListener('click', () => showPanel(spanel.hidden));
+
+  // The word list is large, so load it after the page has drawn.
+  setTimeout(() => {
+    if (window.Spell && window.WORDS_EN) { Spell.load(window.WORDS_EN); runSpell(); }
+  }, 50);
 
   // ---------- Init ----------
   ta.value = store.get('draft', '');

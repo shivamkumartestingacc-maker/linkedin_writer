@@ -10,6 +10,7 @@ Open `index.html` in a browser. No install, no build.
 - **Emojis:** click a favourite to insert it. **Edit** lets you remove favourites, add any emoji from **More**, or add your own symbol.
 - **Right:** LinkedIn preview. **Feed** shows the 3-line cut with "…more". **Expanded** shows the full post. Add an image to preview it.
 - **Jay's LinkedIn rules:** live checks under the editor. The line you are typing gets a warning when it breaks a rule, for example a 4th line in a row. Click "line N" to jump to it. Manual items are checkboxes. Hints only; nothing is blocked. Limits live at the top of `rules.js`.
+- **Spelling:** misspelled words get a red wavy underline (US and UK English, works offline). Click one for suggestions, or click the "N spelling" pill in the bottom bar to fix them all. "Ignore" remembers a word as correct. Bold and italic words are checked too.
 - **Copy for LinkedIn:** copies the post. Paste it into LinkedIn and the styling stays.
 
 ## How styling survives paste
@@ -20,6 +21,8 @@ Limits:
 - Screen readers and LinkedIn search may not read styled letters as normal words. Style only short phrases.
 - Each styled letter counts as 2 characters toward LinkedIn's 3000 limit.
 - Italic has no digits in Unicode, so italic numbers stay plain.
+
+Spell-check word list: SCOWL / Hunspell en_US + en_GB (MIT and BSD), see `DICTIONARY-LICENSE.txt`.
 
 Drafts, favourites, name and headline save in your browser (localStorage). Images stay on your computer.
 

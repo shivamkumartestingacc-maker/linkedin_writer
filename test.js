@@ -52,3 +52,16 @@ assert.strictEqual(st('Everybody loves this', 'buzz'), 'ok');               // "
 assert.strictEqual(st('Hook\n\nP.S. thanks?\nDone.', 'question'), 'warn');
 assert.strictEqual(st('one two three four five six seven eight nine ten eleven twelve thirteen', 'hook'), 'warn');
 console.log('ok');
+
+// Spell checker (loads the real word list)
+const Spell = require('./spell.js');
+const fs = require('fs');
+Spell.load(JSON.parse(fs.readFileSync(__dirname + '/words.js', 'utf8').match(/window\.WORDS_EN = (".*");/s)[1]));
+assert.ok(Spell.known('colour') && Spell.known('color') && Spell.known("Jay's") && Spell.known('Hello'));
+const miss = Spell.find('I recieve teh 𝗯𝗼𝗼𝗸 at https://x.co/wrng #hashtg LinkedIn AI 𝗿𝗲𝗰𝗶𝗲𝘃𝗲', plain).map(m => m.plain);
+assert.deepStrictEqual(miss, ['recieve', 'teh', 'recieve']);           // styled word checked too; links, tags, names skipped
+assert.strictEqual(Spell.suggest('recieve')[0], 'receive');
+assert.ok(Spell.suggest('Teh').includes('The'));                        // keeps capital
+assert.ok(Spell.suggest('alot').includes('a lot'));
+assert.deepStrictEqual(Spell.find('teh', plain, ['teh']), []);         // ignored words
+console.log('spell ok');

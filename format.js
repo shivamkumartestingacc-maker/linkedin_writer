@@ -142,7 +142,10 @@
     return pure ? plain(t) : t;
   }
 
-  const api = { plain, toggle, toggleList, continueList, marker, flags, cleanPaste };
+  // Give a replacement word the same bold/italic/underline style as the word it replaces.
+  const restyle = (orig, rep) => render(rep, flags(orig));
+
+  const api = { plain, toggle, toggleList, continueList, marker, flags, cleanPaste, restyle };
   if (typeof module !== 'undefined') module.exports = api;
   else root.Fmt = api;
 })(this);
