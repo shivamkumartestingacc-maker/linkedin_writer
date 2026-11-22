@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LinkedIn Writer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <h1>LinkedIn Writer</h1>
+    <button id="copy" class="primary">Copy for LinkedIn</button>
+  </header>
+
+  <main class="split">
+    <!-- LEFT: editor -->
+    <section class="pane editor">
+      <div class="toolbar" role="toolbar" aria-label="Formatting">
+        <button data-fmt="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+        <button data-fmt="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+        <button data-fmt="underline" title="Underline (Ctrl+U)"><u>U</u></button>
+        <button data-fmt="strike" title="Strikethrough"><s>S</s></button>
+        <button data-fmt="mono" title="Monospace"><code>M</code></button>
+        <span class="sep"></span>
+        <button data-list="bullet" title="Bullet list">• List</button>
+        <button data-list="number" title="Numbered list">1. List</button>
+        <span class="sep"></span>
+        <button id="clear" title="Remove formatting from selection">Clear</button>
+      </div>
+
+      <div class="emoji-bar">
+        <div id="favs" class="favs" aria-label="Favourite emojis"></div>
+        <button id="edit-favs" title="Edit favourites">Edit</button>
+        <button id="more-emoji" title="All emojis">More ▾</button>
+      </div>
+
+      <div id="fav-editor" class="panel" hidden>
+        <p class="hint">Click a favourite to remove it. Click any emoji below to add it. Or add your own text/symbol:</p>
+        <form id="add-fav" class="row">
+          <input id="fav-input" placeholder="e.g. → or ✔️ or 👉🏻" maxlength="20">
+          <button>Add</button>
+          <button type="button" id="reset-favs">Reset defaults</button>
+        </form>
+      </div>
+
+      <div id="picker" class="panel picker" hidden></div>
+
+      <textarea id="text" placeholder="Write your post…" spellcheck="true"></textarea>
+      <div class="meta"><span id="count">0</span> / 3000 characters</div>
+    </section>
+
+    <!-- RIGHT: preview -->
+    <section class="pane preview-pane">
+      <div class="preview-controls">
+        <div class="seg" role="group" aria-label="View">
+          <button data-view="collapsed" class="on">Feed (see more)</button>
+          <button data-view="expanded">Expanded</button>
+        </div>
+        <div class="seg" role="group" aria-label="Device">
+          <button data-device="desktop" class="on">Desktop</button>
+          <button data-device="mobile">Mobile</button>
+        </div>
+        <label class="file">Image <input id="img" type="file" accept="image/*"></label>
+        <button id="img-remove" hidden>Remove image</button>
+      </div>
+
+      <article id="card" class="card desktop">
+        <div class="author">
+          <div class="avatar" id="avatar">Y</div>
+          <div>
+            <div class="name" id="name" contenteditable="true" spellcheck="false">Your Name</div>
+            <div class="headline" id="headline" contenteditable="true" spellcheck="false">Your headline</div>
+            <div class="when">Now • 🌐</div>
+          </div>
+        </div>
+        <div class="body-wrap">
+          <div id="body" class="body collapsed"></div>
+          <button id="see-more" class="see-more" hidden>…more</button>
+        </div>
+        <img id="post-img" alt="" hidden>
+        <div class="actions"><span>👍 Like</span><span>💬 Comment</span><span>🔁 Repost</span><span>➤ Send</span></div>
+      </article>
+      <p class="hint">Name and headline are editable. Click them.</p>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="format.js"></script>
+  <script src="emojis.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
