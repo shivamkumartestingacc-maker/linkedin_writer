@@ -81,6 +81,9 @@
     const warns = rules.filter(r => r.status === 'warn').length;
     $('#rule-count').textContent = rules.length ? (warns ? `${warns} to fix` : 'all good') : '';
     $('#rule-count').className = 'badge ' + (warns ? 'warn' : 'ok');
+    const pass = rules.filter(r => r.status === 'ok').length;
+    $('#progress-text').innerHTML = rules.length ? `Rules <b>${pass} of ${rules.length}</b> passing` : '';
+    $('#progress-bars').innerHTML = rules.map(r => `<i class="${r.status}"></i>`).join('');
     const ul = $('#auto-rules');
     ul.innerHTML = '';
     if (!rules.length) {
