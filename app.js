@@ -60,6 +60,7 @@
   const DEFAULT_FAVS = ['🚀', '💡', '✅', '👉', '👇', '🔥', '📌', '🎯', '💪', '🙌', '📈', '✨', '🤝', '❤️', '👏', '→', '•'];
   let favs = store.get('favs', DEFAULT_FAVS);
   let editing = false;
+  let dragFrom = null;
 
   function renderFavs() {
     const box = $('#favs');
@@ -68,7 +69,21 @@
     favs.forEach((f, i) => {
       const b = document.createElement('button');
       b.textContent = f;
-      b.title = editing ? 'Remove' : 'Insert';
+      b.title = editing ? 'Drag to move, click to remove' : 'Insert';
+      if (editing) {
+        b.draggable = true;
+        b.addEventListener('dragstart', e => { dragFrom = i; b.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
+        b.addEventListener('dragend', () => b.classList.remove('dragging'));
+        b.addEventListener('dragover', e => { e.preventDefault(); b.classList.add('drop-target'); });
+        b.addEventListener('dragleave', () => b.classList.remove('drop-target'));
+        b.addEventListener('drop', e => {
+          e.preventDefault();
+          if (dragFrom === null || dragFrom === i) return renderFavs();
+          favs.splice(i, 0, favs.splice(dragFrom, 1)[0]);
+          dragFrom = null;
+          saveFavs();
+        });
+      }
       b.addEventListener('click', () => {
         if (editing) { favs.splice(i, 1); saveFavs(); } else insert(f);
       });

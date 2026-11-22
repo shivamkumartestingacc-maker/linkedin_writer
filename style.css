@@ -7,10 +7,10 @@
   --blue: #0a66c2;
   --blue-dark: #004182;
   --link: #0a66c2;
-  --hover: var(--hover);
-  --panel: var(--panel);
-  --danger: var(--danger);
-  --danger-bg: var(--danger-bg);
+  --hover: #eef3f8;
+  --panel: #fafafa;
+  --danger: #c33;
+  --danger-bg: #fde8e8;
   --faint: #aaa;
   --toast: #333;
   --on-blue: #fff;
@@ -70,6 +70,9 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .favs button:hover, .grid button:hover { background: var(--hover); }
 .favs.editing button { outline: 1px dashed var(--danger); border-radius: 4px; }
 .favs.editing button:hover { background: var(--danger-bg); }
+.favs.editing button { cursor: grab; }
+.favs button.dragging { opacity: .4; }
+.favs button.drop-target { outline: 2px solid var(--blue); }
 .panel { border: 1px solid var(--line); border-radius: 8px; padding: 8px; background: var(--panel); }
 .picker { max-height: 240px; overflow: auto; }
 .group { font-size: 12px; color: var(--muted); margin: 6px 0 2px; }
