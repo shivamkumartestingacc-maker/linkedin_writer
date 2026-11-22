@@ -296,6 +296,41 @@
     im.src = URL.createObjectURL(f);
   });
 
+  // Your own earlier post under the preview, so the feed looks real. Only shown when
+  // window.PROFILE.demo is set (the private build), never in the public repo.
+  if (P.demo) {
+    const d = P.demo;
+    const box = $('#feed-below');
+    box.innerHTML = `<p class="demo-label">Earlier in your feed</p>
+      <article class="card desktop demo">
+        <div class="author">
+          <div class="avatar"><img alt=""></div>
+          <div class="who-text">
+            <div class="name-row"><span class="name"></span><span class="in-badge">in</span><span class="you">• You</span></div>
+            <div class="headline"></div>
+            <div class="when">${esc(d.age)} • ${$('.when svg').outerHTML}</div>
+          </div>
+          <span class="dots" aria-hidden="true">•••</span>
+        </div>
+        <div class="body-wrap">
+          <div class="body collapsed">${(d.mentions || []).reduce((h, m) => h.split(esc(m)).join(`<span class="link">${esc(m)}</span>`), linkify(d.text))}</div>
+          <button class="see-more" type="button">…more</button>
+        </div>
+        <div class="counts"><span><span class="heart-mini">❤️</span><span class="num">${esc(d.reactions)}</span></span><span>${esc(d.comments)} comments</span></div>
+        ${$('#card .actions').outerHTML}
+      </article>`;
+    const card = box.querySelector('.demo');
+    const img = card.querySelector('.avatar img');
+    img.src = avatarImg.src || '';
+    img.hidden = !avatarImg.src;
+    card.querySelector('.name').textContent = $('#name').textContent;
+    card.querySelector('.headline').textContent = $('#headline').textContent;
+    card.querySelector('.see-more').addEventListener('click', e => {
+      card.querySelector('.body').classList.remove('collapsed');
+      e.currentTarget.hidden = true;
+    });
+  }
+
   // ---------- Theme ----------
   const root = document.documentElement;
   const isDark = () => (root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark';

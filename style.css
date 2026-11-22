@@ -161,8 +161,17 @@ textarea.warn, textarea.warn:focus { border-color: var(--warn); }
 .rule-list input:checked + label { color: var(--text); text-decoration: line-through; text-decoration-color: var(--faint); }
 
 /* Preview side */
-.preview-pane { display: flex; flex-direction: column; gap: 16px; align-items: center; }
-.preview-pane .pane-head, .preview-controls { width: 100%; }
+/* Everything on the preview side shares one 555px column (LinkedIn's feed width),
+   and its top lines up with the editor card's title. */
+.preview-pane { display: flex; flex-direction: column; gap: 16px; align-items: center; padding-top: 40px; padding-bottom: 0; }
+.preview-pane > * { width: 100%; max-width: 555px; }
+.preview-pane > .card.mobile { max-width: 360px; }
+.preview-pane > .hint { margin: -8px 0 0; text-align: center; }
+.feed-below { display: flex; flex-direction: column; gap: 8px; }
+.feed-below:empty { display: none; }
+.demo-label { font-size: 12px; color: var(--muted); margin: 0; }
+.counts { display: flex; justify-content: space-between; padding: 0 16px 8px; font-size: 12px; color: var(--li-muted); }
+.counts .num { font-size: 13px; margin-left: 4px; }
 .who { display: flex; gap: 12px; align-items: center; }
 .head-actions { display: flex; gap: 8px; align-items: center; }
 .seg { display: inline-flex; gap: 6px; }
@@ -219,7 +228,13 @@ textarea.warn, textarea.warn:focus { border-color: var(--warn); }
 .heart { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #df704d; }
 
 /* Step-style progress, like "Step 1 of 4" */
-.progress { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 8px; }
+/* Pinned to the bottom of the preview column, like a step indicator. */
+.progress {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  position: sticky; bottom: 0; margin-top: auto;
+  padding: 12px 0 calc(16px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(to bottom, transparent, var(--sky) 30%);
+}
 .bars { display: flex; gap: 5px; }
 .bars i { width: 18px; height: 2px; border-radius: 2px; background: var(--faint); opacity: .5; }
 .bars i.ok, .bars i.info { background: var(--strong); opacity: 1; }
