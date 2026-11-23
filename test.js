@@ -27,7 +27,8 @@ assert.strictEqual(continueList('👉🏽 x').next, '👉🏽 ');
 assert.strictEqual(continueList('📌 ').empty, true);
 assert.strictEqual(continueList('Plain line'), null);
 assert.strictEqual(continueList('🚀Launch'), null);                                  // emoji needs a space after it
-assert.strictEqual(cleanPaste('a\u00A0b\r\nc\u200B\t \n\n\n\nd'), 'a b\nc\n\nd');
+assert.strictEqual(cleanPaste('a\u00A0b\r\nc\u200B\t \n\n\n\nd'), 'a b\nc\n\n\n\nd');      // blank lines kept
+assert.strictEqual(cleanPaste('  indented\twith  two'), '  indented    with  two');           // spaces kept
 assert.strictEqual(cleanPaste('👩\u200D💻 ok'), '👩\u200D💻 ok');                    // emoji joiner kept
 assert.strictEqual(cleanPaste('𝗛𝗶 there'), '𝗛𝗶 there');                               // normal paste keeps styling
 assert.strictEqual(cleanPaste('𝗛𝗶 there', true), 'Hi there');                         // pure paste removes it

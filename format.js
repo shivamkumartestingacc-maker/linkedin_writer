@@ -128,17 +128,18 @@
     }).join('\n');
   }
 
-  // Clean pasted text: plain line breaks, normal spaces, no invisible junk, at most one blank line.
+  // Clean pasted text: plain line breaks, normal spaces, no invisible junk. Your blank lines
+  // and spacing are kept exactly; tabs become 4 spaces.
   // Zero-width joiner (U+200D) is kept because emoji like 👩‍💻 need it.
   // pure = true also turns styled letters (𝗯𝗼𝗹𝗱) back into normal letters.
   function cleanPaste(text, pure = false) {
     let t = text
       .replace(/\r\n?/g, '\n')
-      .replace(/[\u00A0\u2007\u202F\t]/g, ' ')
+      .replace(/\t/g, '    ')
+      .replace(/[\u00A0\u2007\u202F]/g, ' ')
       .replace(/[\u200B\u200C\u2060\uFEFF\u00AD]/g, '')
       .replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, '')
-      .replace(/[ ]+$/gm, '')
-      .replace(/\n{3,}/g, '\n\n');
+      .replace(/[ ]+$/gm, '');
     return pure ? plain(t) : t;
   }
 
