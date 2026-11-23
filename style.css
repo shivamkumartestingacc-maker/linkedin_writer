@@ -193,7 +193,22 @@ textarea.warn, textarea.warn:focus { border-color: var(--warn); }
 /* Everything on the preview side shares one 555px column (LinkedIn's feed width),
    and its top lines up with the editor card's title. */
 .preview-pane { display: flex; flex-direction: column; gap: 16px; align-items: center; padding-bottom: 0; }
-.preview-pane > * { width: 100%; max-width: 555px; }
+.preview-pane > * { width: 100%; max-width: 555px; flex-shrink: 0; }   /* never squash the card; scroll instead */
+/* Scroll affordance: thin visible scrollbar, plus a fade and a "More below" button while content is hidden. */
+.pane { scrollbar-width: thin; scrollbar-color: var(--faint) transparent; }
+.pane::-webkit-scrollbar { width: 8px; }
+.pane::-webkit-scrollbar-thumb { background: var(--faint); border-radius: 8px; }
+.preview-pane > .scroll-more {
+  position: sticky; bottom: 0; z-index: 3; width: auto; max-width: none; margin-top: -56px;
+  display: flex; justify-content: center; align-items: flex-end; align-self: stretch; height: 56px; padding: 0 0 12px;
+  border: none; border-radius: 0; background: linear-gradient(to bottom, transparent, var(--sky) 75%); pointer-events: none;
+}
+.scroll-more span {
+  pointer-events: auto; display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px;
+  background: var(--raised); color: var(--text); font-size: 12px; font-weight: 600;
+  box-shadow: 0 0 0 1px var(--line), 0 6px 16px -8px rgba(0, 0, 0, .35); cursor: pointer;
+}
+.scroll-more span:hover { background: var(--strong); color: var(--on-strong); }
 .preview-pane > .card.mobile { max-width: 360px; }
 .preview-pane > .hint { margin: -8px 0 0; text-align: center; }
 .who { display: flex; gap: 12px; align-items: center; }

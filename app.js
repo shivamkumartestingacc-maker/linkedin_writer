@@ -659,6 +659,16 @@
     if (window.Spell && window.WORDS_EN) { Spell.load(window.WORDS_EN); runSpell(); }
   }, 50);
 
+  // ---------- Scroll hint on the preview side ----------
+  const pv = $('.preview-pane'), more = $('#scroll-more');
+  const checkMore = () => { more.hidden = pv.scrollHeight - pv.clientHeight - pv.scrollTop < 8; };
+  pv.addEventListener('scroll', checkMore);
+  window.addEventListener('resize', checkMore);
+  new ResizeObserver(checkMore).observe($('#card'));
+  const scrollMore = () => pv.scrollBy({ top: pv.clientHeight * 0.8, behavior: 'smooth' });
+  more.firstElementChild.addEventListener('click', scrollMore);
+  more.firstElementChild.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); scrollMore(); } });
+
   // ---------- Init ----------
   ta.value = store.get('draft', '');
   renderFavs();
